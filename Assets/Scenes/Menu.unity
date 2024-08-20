@@ -1225,6 +1225,8 @@ MonoBehaviour:
   Leave: {fileID: 1873924335}
   lobby: {fileID: 4028190410240055466, guid: 990c74e8b80041b4390a71f408392cbd, type: 3}
   user: {fileID: 6205358786202567562, guid: 28b0a4890b98b5b48bac8e17859da20d, type: 3}
+  LobbyList: {fileID: 1711511955}
+  PlayerList: {fileID: 1968725313}
 --- !u!4 &141922624
 Transform:
   m_ObjectHideFlags: 0
@@ -11896,7 +11898,7 @@ GameObject:
   - component: {fileID: 1968725316}
   - component: {fileID: 1968725317}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: PlayerList
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -12,6 +12,7 @@ public class Reference : MonoBehaviour
     public Button Create, JoinRoom, Leave;
     public GameObject lobby;
     public GameObject user;
+    public Transform LobbyList, PlayerList;
 
     private void Awake()
     {

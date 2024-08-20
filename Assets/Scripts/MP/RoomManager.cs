@@ -12,8 +12,12 @@ public class RoomManager : MonoBehaviourPunCallbacks
     RoomOptions roomOptions = new RoomOptions { IsOpen = true, EmptyRoomTtl = 1024, MaxPlayers = 10, PlayerTtl = 2048, IsVisible = true, CleanupCacheOnLeave = true };
     readonly TypedLobby lobbyFilter = new("Game", LobbyType.Default);
     bool isRoomFull => PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers;
-
+    RoomInfo roomInfo;
     byte code_length = 6;
+
+    [SerializeField]
+    User[] players;
+
     string Generate()
     {
         string alphanum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -22,13 +26,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void ListRooms()
     {
-        
+        PhotonNetwork.GetCustomRoomList(lobbyFilter, )
     }
 
     public void CreateRoom(string name = "Unnamed", bool locked = false, int playerCount = 10)
     {
         PhotonNetwork.NickName = Ref.playerName.text;
         roomOptions.MaxPlayers = playerCount;
+        players = new User[playerCount];
         PhotonNetwork.CreateRoom(name, roomOptions, lobbyFilter, null);
     }
 
@@ -43,7 +48,10 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-
+        User usr = Instantiate(Ref.user, Ref.PlayerList).GetComponent<User>();
+        usr.playerName = Ref.playerName.text;
+        usr.ping = PhotonNetwork.GetPing();
+        players[0] = usr;
     }
 
 
@@ -59,6 +67,10 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         log.L(newPlayer.NickName + " Joined");
+        User usr = Instantiate(Ref.user, Ref.PlayerList).GetComponent<User>();
+        usr.playerName = newPlayer.NickName;
+        usr.ping = PhotonNetwork.GetPing();
+        players[PhotonNetwork.CurrentRoom.PlayerCount] = usr;
         if (isRoomFull)
         {
 
@@ -67,5 +79,10 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         log.L(otherPlayer.NickName + " Left Room");
+        foreach(User user in players)
+        {
+            if (user.playerName == otherPlayer.NickName)
+                Destroy(user);
+        }
     }
 }
