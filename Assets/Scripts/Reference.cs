@@ -8,8 +8,9 @@ public class Reference : MonoBehaviour
 {
     public static Reference Ref { get; private set; }
     public TextMeshProUGUI playerName, lobbyName;
+    public TMP_Dropdown dd_playerNos;
 
-    public Button Create, JoinRoom, Leave;
+    public Button Create, JoinRoom, Leave, Exit;
     public GameObject lobby;
     public GameObject user;
     public Transform LobbyList, PlayerList;
@@ -19,6 +20,6 @@ public class Reference : MonoBehaviour
         if (Ref == null)
             Ref = this;
         else
-            Destroy(Ref);
-    }
+            Destroy(Ref);        
+    }  
 }
