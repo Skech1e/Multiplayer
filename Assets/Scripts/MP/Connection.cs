@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Logger;
+using static RoomManager;
 
 public class Connection : MonoBehaviourPunCallbacks
 {
@@ -19,9 +20,8 @@ public class Connection : MonoBehaviourPunCallbacks
     }
 
     public override void OnConnectedToMaster()
-    {
-        TypedLobby lobbyFilter = new("Game", LobbyType.Default);
-        PhotonNetwork.JoinLobby(lobbyFilter);
+    {        
+        PhotonNetwork.JoinLobby(rm.lobbyFilter);
         log.L("Online");
     }
 

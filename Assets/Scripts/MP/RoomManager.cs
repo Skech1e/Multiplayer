@@ -23,7 +23,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public const string ACCESS_ATTR = "access";
     public const string PING_ATTR = "ping";
 
-    readonly TypedLobby lobbyFilter = new("Game", LobbyType.Default);
+    public readonly TypedLobby lobbyFilter = new("Game", LobbyType.Default);
     bool isRoomFull => PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers;
     public List<Games> games = new();
     public List<RoomInfo> rooms = new();
@@ -40,52 +40,68 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void UpdateRoomList(List<RoomInfo> roomList)
     {
+        print("count " + roomList.Count);
         for (int i = 0; i < roomList.Count; i++)
         {
+            print(i);
             RoomInfo rInfo = roomList[i];
+            print(rInfo.Name);
             if (rooms.Count == 0)
             {
+                print(rInfo.Name + " first");
                 rooms.Add(rInfo);
                 Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
+                game.name = rInfo.Name;
+                game.LobbyName = rInfo.Name;
+                game.playerCount = rInfo.MaxPlayers;
                 games.Add(game);
             }
             else if (rooms[i] != roomList[i])
             {
                 if (rInfo.RemovedFromList)
                 {
+                    print(rInfo.Name + " yeeted");
                     rooms.Remove(rInfo);
                     Destroy(games[i].gameObject);
                     games.Remove(games[i]);
                 }
                 else
                 {
-                    print("ok");
                     rooms.Add(rInfo);
                     Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
+                    game.name = rInfo.Name;
+                    game.LobbyName = rInfo.Name;
+                    game.playerCount = rInfo.MaxPlayers;
                     games.Add(game);
                 }
-            }
+            }/*
+            print(i + "below");
             Games ga = games[i];
             ga.LobbyName = rInfo.Name;
-            ga.playerCount = rInfo.MaxPlayers;
+            print(ga.name + " renamed" + ga.LobbyName);
+            ga.playerCount = rInfo.MaxPlayers;*/
         }
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         UpdateRoomList(roomList);
+        /*print(roomList.Count);
+        for (int i = 0; i < roomList.Count; i++)
+        {
+            print(roomList[i].Name);
+        }*/
     }
 
     public void CreateRoom(string name = "Unnamed", bool locked = false, int playerCount = 10)
     {
-        RoomOptions roomOptions = new RoomOptions { IsOpen = true, EmptyRoomTtl = 512, MaxPlayers = 10, PlayerTtl = 2048, IsVisible = true, CleanupCacheOnLeave = true };
-        roomOptions.CustomRoomPropertiesForLobby = new[] { MAP_ATTR, ACCESS_ATTR, PING_ATTR };
-        roomOptions.CustomRoomProperties = new() { { MAP_ATTR, 0 }, { ACCESS_ATTR, 1 }, { PING_ATTR, 2 } };
+        RoomOptions roomOptions = new RoomOptions { IsOpen = true, EmptyRoomTtl = 0, MaxPlayers = playerCount, PlayerTtl = 2048, IsVisible = true };
+        //roomOptions.CustomRoomPropertiesForLobby = new[] { MAP_ATTR, ACCESS_ATTR, PING_ATTR };
+        //roomOptions.CustomRoomProperties = new() { { MAP_ATTR, 0 }, { ACCESS_ATTR, 1 }, { PING_ATTR, 2 } };
         PhotonNetwork.NickName = Ref.playerName.text;
-        roomOptions.MaxPlayers = playerCount;
         players = new User[playerCount];
         PhotonNetwork.CreateRoom(name, roomOptions, lobbyFilter, null);
-        log.L("created");
+        log.L("created w/ pc " + playerCount);
     }
 
     public void JoinRoom(string lobby)

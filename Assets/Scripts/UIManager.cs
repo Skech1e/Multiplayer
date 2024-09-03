@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour
 
     private void OnEnable()
     {
-        Ref.Create.onClick.AddListener(() => rm.CreateRoom(Ref.lobbyName.text, false, playerCount));
+        Ref.Create.onClick.AddListener(() => rm.CreateRoom(Ref.lobbyName.text, false, 4));
         Ref.Leave.onClick.AddListener(() => rm.LeaveRoom());
         Ref.Exit.onClick.AddListener(() => Application.Quit());
         Ref.dd_playerNos.onValueChanged.AddListener(delegate
