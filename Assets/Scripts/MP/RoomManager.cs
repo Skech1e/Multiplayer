@@ -40,23 +40,33 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void UpdateRoomList(List<RoomInfo> roomList)
     {
-        print("count " + roomList.Count);
+        if (games.Count > 0)
+        {
+            foreach (var game in games)
+                Destroy(game.gameObject);
+            games.Clear();
+        }
+        //print("count " + roomList.Count);
         for (int i = 0; i < roomList.Count; i++)
         {
-            print(i);
             RoomInfo rInfo = roomList[i];
             print(rInfo.Name);
-            if (rooms.Count == 0)
+
+            if (rInfo != null && rInfo.RemovedFromList)
             {
-                print(rInfo.Name + " first");
-                rooms.Add(rInfo);
-                Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
-                game.name = rInfo.Name;
-                game.LobbyName = rInfo.Name;
-                game.playerCount = rInfo.MaxPlayers;
-                games.Add(game);
+                print(rInfo.Name + " yeeted");
+                rooms.Remove(rInfo);
+                Destroy(games[i].gameObject);
+                games.Remove(games[i]);
             }
-            else if (rooms[i] != roomList[i])
+
+            rooms.Add(rInfo);
+            Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
+            game.name = rInfo.Name;
+            games.Add(game);
+
+
+            /*else if (rooms[i] != roomList[i])
             {
                 if (rInfo.RemovedFromList)
                 {
@@ -70,27 +80,31 @@ public class RoomManager : MonoBehaviourPunCallbacks
                     rooms.Add(rInfo);
                     Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
                     game.name = rInfo.Name;
-                    game.LobbyName = rInfo.Name;
-                    game.playerCount = rInfo.MaxPlayers;
                     games.Add(game);
                 }
-            }/*
-            print(i + "below");
-            Games ga = games[i];
-            ga.LobbyName = rInfo.Name;
-            print(ga.name + " renamed" + ga.LobbyName);
-            ga.playerCount = rInfo.MaxPlayers;*/
+            }*/
+            //print(i + "below");
+            //Games ga = games[i];
+            game.LobbyName = rInfo.Name;
+            //print(game.name + " renamed" + game.LobbyName);
+            game.playerCount = rInfo.MaxPlayers;
         }
+    }
+
+    public void RefreshLobby()
+    {
+        /*if (games.Count > 0)
+        {
+            foreach (var game in games)
+                Destroy(game.gameObject);
+            games.Clear();
+        }*/
+        PhotonNetwork.JoinLobby(lobbyFilter);
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         UpdateRoomList(roomList);
-        /*print(roomList.Count);
-        for (int i = 0; i < roomList.Count; i++)
-        {
-            print(roomList[i].Name);
-        }*/
     }
 
     public void CreateRoom(string name = "Unnamed", bool locked = false, int playerCount = 10)

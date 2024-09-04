@@ -10,7 +10,7 @@ public class Reference : MonoBehaviour
     public TextMeshProUGUI playerName, lobbyName;
     public TMP_Dropdown dd_playerNos;
 
-    public Button Create, JoinRoom, Leave, Exit;
+    public Button Create, Refresh, Leave, Exit;
     public GameObject lobby;
     public GameObject user;
     public Transform LobbyList, PlayerList;

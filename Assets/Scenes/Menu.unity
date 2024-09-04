@@ -1225,7 +1225,7 @@ MonoBehaviour:
   lobbyName: {fileID: 1567438829}
   dd_playerNos: {fileID: 1100681065}
   Create: {fileID: 833078433}
-  JoinRoom: {fileID: 1689565883}
+  Refresh: {fileID: 1689565883}
   Leave: {fileID: 1873924335}
   Exit: {fileID: 1092393729}
   lobby: {fileID: 4028190410240055466, guid: 990c74e8b80041b4390a71f408392cbd, type: 3}
@@ -2455,7 +2455,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Join
+  m_text: Refresh
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -10130,7 +10130,7 @@ GameObject:
   - component: {fileID: 1689565884}
   - component: {fileID: 1689565883}
   m_Layer: 5
-  m_Name: JoinRoom
+  m_Name: Refresh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10199,31 +10199,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1689565884}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1586064958}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 196418696}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1689565884
 MonoBehaviour:
   m_ObjectHideFlags: 0
