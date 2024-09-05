@@ -40,65 +40,72 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void UpdateRoomList(List<RoomInfo> roomList)
     {
+        /*if (games.Count > 0)
+        {
+            foreach (var game in games)
+            {
+                print("X");
+                Destroy(game.gameObject);
+            }
+            games.Clear();
+        }*/
+        //print("count " + roomList.Count);
+        for (int i = 0; i < roomList.Count; i++)
+        {
+            RoomInfo rInfo = roomList[i];
+            print(roomList[0].Name + " " + i);
+            if (roomList.Count > 1)
+                print(roomList[1].Name + " " + i);
+
+            if (rInfo.RemovedFromList)
+            {
+                print(rInfo.Name + " " + i + " yeeted");
+                rooms.Remove(rInfo);
+                Destroy(games[i].gameObject);
+                games.RemoveAt(i);
+            }
+            else
+            {
+                rooms.Add(rInfo);
+                Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
+                game.name = rInfo.Name;
+                games.Add(game);
+
+
+                /*else if (rooms[i] != roomList[i])
+                {
+                    if (rInfo.RemovedFromList)
+                    {
+                        print(rInfo.Name + " yeeted");
+                        rooms.Remove(rInfo);
+                        Destroy(games[i].gameObject);
+                        games.Remove(games[i]);
+                    }
+                    else
+                    {
+                        rooms.Add(rInfo);
+                        Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
+                        game.name = rInfo.Name;
+                        games.Add(game);
+                    }
+                }*/
+                //print(i + "below");
+                //Games ga = games[i];
+                game.LobbyName = rInfo.Name;
+                //print(game.name + " renamed" + game.LobbyName);
+                game.playerCount = rInfo.MaxPlayers;
+            }
+        }
+    }
+
+    public void RefreshLobby()
+    {
         if (games.Count > 0)
         {
             foreach (var game in games)
                 Destroy(game.gameObject);
             games.Clear();
         }
-        //print("count " + roomList.Count);
-        for (int i = 0; i < roomList.Count; i++)
-        {
-            RoomInfo rInfo = roomList[i];
-            print(rInfo.Name);
-
-            if (rInfo != null && rInfo.RemovedFromList)
-            {
-                print(rInfo.Name + " yeeted");
-                rooms.Remove(rInfo);
-                Destroy(games[i].gameObject);
-                games.Remove(games[i]);
-            }
-
-            rooms.Add(rInfo);
-            Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
-            game.name = rInfo.Name;
-            games.Add(game);
-
-
-            /*else if (rooms[i] != roomList[i])
-            {
-                if (rInfo.RemovedFromList)
-                {
-                    print(rInfo.Name + " yeeted");
-                    rooms.Remove(rInfo);
-                    Destroy(games[i].gameObject);
-                    games.Remove(games[i]);
-                }
-                else
-                {
-                    rooms.Add(rInfo);
-                    Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
-                    game.name = rInfo.Name;
-                    games.Add(game);
-                }
-            }*/
-            //print(i + "below");
-            //Games ga = games[i];
-            game.LobbyName = rInfo.Name;
-            //print(game.name + " renamed" + game.LobbyName);
-            game.playerCount = rInfo.MaxPlayers;
-        }
-    }
-
-    public void RefreshLobby()
-    {
-        /*if (games.Count > 0)
-        {
-            foreach (var game in games)
-                Destroy(game.gameObject);
-            games.Clear();
-        }*/
         PhotonNetwork.JoinLobby(lobbyFilter);
     }
 
