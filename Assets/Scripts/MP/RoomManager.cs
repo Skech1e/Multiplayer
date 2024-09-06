@@ -26,7 +26,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public readonly TypedLobby lobbyFilter = new("Game", LobbyType.Default);
     bool isRoomFull => PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers;
     public List<Games> games = new();
-    public List<RoomInfo> rooms = new();
+    public List<RoomInfo> cachedRoomsList = new();
+    public List<string> lavduPun2 = new();
+
     byte code_length = 6;
 
     [SerializeField]
@@ -40,60 +42,64 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void UpdateRoomList(List<RoomInfo> roomList)
     {
-        /*if (games.Count > 0)
-        {
-            foreach (var game in games)
-            {
-                print("X");
-                Destroy(game.gameObject);
-            }
-            games.Clear();
-        }*/
-        //print("count " + roomList.Count);
+        //print("chck "+cachedRoomsList.Count);
+        lavduPun2.Clear();
         for (int i = 0; i < roomList.Count; i++)
         {
-            RoomInfo rInfo = roomList[i];
-            print(roomList[0].Name + " " + i);
-            if (roomList.Count > 1)
-                print(roomList[1].Name + " " + i);
+            lavduPun2.Add(roomList[i].Name);
+        }
 
-            if (rInfo.RemovedFromList)
+        if (cachedRoomsList.Count <= 0)
+        {
+            cachedRoomsList.Clear();
+            cachedRoomsList = roomList;
+        }
+        else
+        {
+            foreach (RoomInfo room in roomList)
             {
-                print(rInfo.Name + " " + i + " yeeted");
-                rooms.Remove(rInfo);
-                Destroy(games[i].gameObject);
-                games.RemoveAt(i);
-            }
-            else
-            {
-                rooms.Add(rInfo);
-                Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
-                game.name = rInfo.Name;
-                games.Add(game);
-
-
-                /*else if (rooms[i] != roomList[i])
+                if (cachedRoomsList.Contains(room))
                 {
-                    if (rInfo.RemovedFromList)
+                    print("A");
+                    //List<RoomInfo> newList = cachedRoomsList;
+                    if (room.RemovedFromList)
                     {
-                        print(rInfo.Name + " yeeted");
-                        rooms.Remove(rInfo);
-                        Destroy(games[i].gameObject);
-                        games.Remove(games[i]);
+                        print("A1");
+                        //newList.Remove(newList[i]);
+                        cachedRoomsList.Remove(room);
+                        print(room.Name + " yeeted ");
                     }
                     else
                     {
-                        rooms.Add(rInfo);
-                        Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
-                        game.name = rInfo.Name;
-                        games.Add(game);
+                        print("A2");
+                        //newList[i] = room;
                     }
-                }*/
-                //print(i + "below");
-                //Games ga = games[i];
-                game.LobbyName = rInfo.Name;
-                //print(game.name + " renamed" + game.LobbyName);
-                game.playerCount = rInfo.MaxPlayers;
+                    //cachedRoomsList = newList;
+                }
+                else
+                {
+                    print("B");
+                    cachedRoomsList.Add(room);
+                }
+            }
+        }
+        if (games.Count > 0)
+        {
+            foreach (var game in games)
+                Destroy(game.gameObject);
+            games.Clear();
+        }
+
+        if (cachedRoomsList.Count > 0)
+        {
+            print(cachedRoomsList.Count);
+            foreach (var room in cachedRoomsList)
+            {
+                Games game = Instantiate(Ref.lobby, Ref.LobbyList).GetComponent<Games>();
+                game.name = room.Name;
+                game.LobbyName = room.Name;
+                game.playerCount = room.PlayerCount;
+                games.Add(game);
             }
         }
     }
@@ -170,7 +176,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         foreach (User user in players)
         {
             if (user.playerName == otherPlayer.NickName)
-                Destroy(user);
+                Destroy(user.gameObject);
         }
     }
 }
