@@ -19,20 +19,22 @@ public class RoomManager : MonoBehaviourPunCallbacks
             Destroy(rm);
     }
 
+    bool isMaster => PhotonNetwork.IsMasterClient;
+
     public const string MAP_ATTR = "map";
     public const string ACCESS_ATTR = "access";
     public const string PING_ATTR = "ping";
 
     public readonly TypedLobby lobbyFilter = new("Game", LobbyType.Default);
+    RoomOptions roomOptions = new RoomOptions { IsOpen = true, IsVisible = true, EmptyRoomTtl = 0, PlayerTtl = 0 };
     bool isRoomFull => PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers;
     public List<Games> games = new();
     public List<RoomInfo> cachedRoomsList = new();
-    public List<string> lavduPun2 = new();
 
     byte code_length = 6;
 
     [SerializeField]
-    User[] players;
+    List<User> players = new();    
 
     string Generate()
     {
@@ -42,13 +44,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void UpdateRoomList(List<RoomInfo> roomList)
     {
-        //print("chck "+cachedRoomsList.Count);
-        lavduPun2.Clear();
-        for (int i = 0; i < roomList.Count; i++)
-        {
-            lavduPun2.Add(roomList[i].Name);
-        }
-
         if (cachedRoomsList.Count <= 0)
         {
             cachedRoomsList.Clear();
@@ -60,27 +55,22 @@ public class RoomManager : MonoBehaviourPunCallbacks
             {
                 if (cachedRoomsList.Contains(room))
                 {
-                    print("A");
-                    //List<RoomInfo> newList = cachedRoomsList;
                     if (room.RemovedFromList)
                     {
-                        print("A1");
-                        //newList.Remove(newList[i]);
                         cachedRoomsList.Remove(room);
                         print(room.Name + " yeeted ");
                     }
                     else
                     {
-                        print("A2");
-                        //newList[i] = room;
+                        for (int i = 0; i < cachedRoomsList.Count; i++)
+                        {
+                            if (cachedRoomsList[i].Name == room.Name)
+                                cachedRoomsList[i] = room;
+                        }
                     }
-                    //cachedRoomsList = newList;
                 }
                 else
-                {
-                    print("B");
                     cachedRoomsList.Add(room);
-                }
             }
         }
         if (games.Count > 0)
@@ -122,30 +112,37 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void CreateRoom(string name = "Unnamed", bool locked = false, int playerCount = 10)
     {
-        RoomOptions roomOptions = new RoomOptions { IsOpen = true, EmptyRoomTtl = 0, MaxPlayers = playerCount, PlayerTtl = 2048, IsVisible = true };
-        //roomOptions.CustomRoomPropertiesForLobby = new[] { MAP_ATTR, ACCESS_ATTR, PING_ATTR };
-        //roomOptions.CustomRoomProperties = new() { { MAP_ATTR, 0 }, { ACCESS_ATTR, 1 }, { PING_ATTR, 2 } };
+        roomOptions.CustomRoomPropertiesForLobby = new[] { MAP_ATTR, ACCESS_ATTR, PING_ATTR };
+        roomOptions.CustomRoomProperties = new() { { MAP_ATTR, 0 }, { ACCESS_ATTR, 1 }, { PING_ATTR, 2 } };
+        roomOptions.MaxPlayers = playerCount;
         PhotonNetwork.NickName = Ref.playerName.text;
-        players = new User[playerCount];
         PhotonNetwork.CreateRoom(name, roomOptions, lobbyFilter, null);
         log.L("created w/ pc " + playerCount);
     }
 
     public void JoinRoom(string lobby)
     {
+        PhotonNetwork.NickName = Ref.playerName.text;        
         if (PhotonNetwork.IsConnectedAndReady)
-        {
             PhotonNetwork.JoinRoom(lobby);
-            log.L(PhotonNetwork.NickName + " Joined");
-        }
     }
 
     public override void OnJoinedRoom()
     {
-        User usr = Instantiate(Ref.user, Ref.PlayerList).GetComponent<User>();
-        usr.playerName = Ref.playerName.text;
-        usr.ping = PhotonNetwork.GetPing();
-        players[0] = usr;
+        Room room = PhotonNetwork.CurrentRoom;
+        log.L(PhotonNetwork.NickName + " Joined " + room.PlayerCount);
+        foreach (var p in PhotonNetwork.CurrentRoom.Players)
+            print(p.Key + " " + p.Value);
+        for (int i = 0; i < room.PlayerCount; i++)
+        {
+            Player pl = room.Players[i + 1];
+            User usr = Instantiate(Ref.user, Ref.PlayerList).GetComponent<User>();
+            usr.name = pl.NickName;
+            usr.playerName = pl.NickName;
+            //usr.ping = pl.
+            players.Add(usr);
+        }
+
     }
 
 
@@ -155,28 +152,41 @@ public class RoomManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.LeaveRoom();
             log.L(PhotonNetwork.NickName + " Left Room");
+            for (int i = 0; i < players.Count; i++)
+                Destroy(players[i].gameObject);
+            players.Clear();
         }
+    }
+
+    public override void OnLeftRoom()
+    {
+
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         log.L(newPlayer.NickName + " Joined");
+        string npName = newPlayer.NickName;
         User usr = Instantiate(Ref.user, Ref.PlayerList).GetComponent<User>();
-        usr.playerName = newPlayer.NickName;
+        usr.name = newPlayer.NickName;
+        usr.playerName = npName;
         usr.ping = PhotonNetwork.GetPing();
-        players[PhotonNetwork.CurrentRoom.PlayerCount] = usr;
-        if (isRoomFull)
-        {
-
-        }
+        players.Add(usr);
+        PhotonNetwork.CurrentRoom.IsOpen = !isRoomFull;
     }
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        log.L(otherPlayer.NickName + " Left Room");
-        foreach (User user in players)
+        Room room = PhotonNetwork.CurrentRoom;
+        room.IsOpen = !isRoomFull;
+        foreach(var p in room.Players)
         {
-            if (user.playerName == otherPlayer.NickName)
-                Destroy(user.gameObject);
+            if (p.Value == otherPlayer)
+                room.Players.Remove(p.Key);
         }
+        log.L(otherPlayer.NickName + " Left Room");
+        User usr = players.Find(p => p.name == otherPlayer.NickName);
+        players.Remove(usr);
+        Destroy(usr.gameObject);
+        //Destroy(go);
     }
 }

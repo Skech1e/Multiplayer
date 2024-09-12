@@ -1232,6 +1232,8 @@ MonoBehaviour:
   user: {fileID: 6205358786202567562, guid: 28b0a4890b98b5b48bac8e17859da20d, type: 3}
   LobbyList: {fileID: 1711511955}
   PlayerList: {fileID: 1968725313}
+  Menu: {fileID: 182927208}
+  LobbyPanel: {fileID: 196418697}
 --- !u!4 &141922624
 Transform:
   m_ObjectHideFlags: 0
@@ -1273,6 +1275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   games: []
+  lavduPun2: []
   players: []
 --- !u!114 &141922627
 MonoBehaviour:
