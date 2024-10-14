@@ -180,8 +180,11 @@ public class RoomManager : MonoBehaviourPunCallbacks
         room.IsOpen = !isRoomFull;
         foreach(var p in room.Players)
         {
-            if (p.Value == otherPlayer)
+            if (p.Value.NickName == otherPlayer.NickName)
+            {
+                print("Gone: " + p.Key);
                 room.Players.Remove(p.Key);
+            }
         }
         log.L(otherPlayer.NickName + " Left Room");
         User usr = players.Find(p => p.name == otherPlayer.NickName);
